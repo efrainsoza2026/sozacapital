@@ -288,6 +288,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#1A1A2E;min-hei
   <div class="nb" onclick="ir('graficos')"><span class="ic">📈</span>Gráficos</div>
   <div class="nb" onclick="ir('recomendaciones')"><span class="ic">💡</span>Recomendaciones</div>
   <div class="ndiv"></div>
+  <div class="nav-s">Imprimir</div>
+  <div class="nb" onclick="window.print();toggleMenu()"><span class="ic">🖨</span>Imprimir Sección</div>
+  <div class="nb" onclick="imprimirTodo();toggleMenu()"><span class="ic">📄</span>Imprimir Todo</div>
+  <div class="ndiv"></div>
   <div class="nav-s">Herramientas</div>
   <div class="nb" onclick="ir('inquilinos')"><span class="ic">🏘️</span>Inquilinos</div>
   <div class="nb" onclick="ir('metas')"><span class="ic">🎯</span>Metas de Ahorro</div>
@@ -308,7 +312,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#1A1A2E;min-hei
     <div class="tb-right">
       <span class="badge" id="mesLbl">Enero</span>
       <button class="btn" onclick="window.print()">🖨 Sección</button>
-      <button class="btn" style="background:#7D3C98" onclick="imprimirTodo()">🖨 Todo</button>
+      <button class="btn" style="background:#7D3C98;display:none" id="btnImpTodo" onclick="imprimirTodo()">🖨 Todo</button>
       <button class="btn g" onclick="guardar()">💾 Guardar</button>
       <button class="btn b" onclick="exportar()">📥 Backup</button>
       <label class="btn gr" style="cursor:pointer">📂<input type="file" accept=".json" style="display:none" onchange="importar(this)"></label>
