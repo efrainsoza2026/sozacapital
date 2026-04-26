@@ -2764,6 +2764,9 @@ function rDineroPrestado() {
             '<div style="font-size:20px;font-family:DM Mono,monospace;font-weight:700;color:var(--orange)">+' + f$(ganancia) + '</div></div>' +
         '</div>' +
         '<div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:7px;text-transform:uppercase">📅 Calendario de Cobros</div>' +
+        '<div style="margin-bottom:10px">' +
+          '<button onclick="generarContrato(' + d.id + ')" style="width:100%;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer">📄 Generar Contrato PDF</button>' +
+        '</div>' +
         '<div class="sx">' +
           '<table class="tbl" style="font-size:11px"><thead><tr>' +
             '<th>Mes</th><th class="r">Cuota a Cobrar</th><th class="r">Interés</th><th class="r">Capital</th>' +
@@ -2773,6 +2776,179 @@ function rDineroPrestado() {
       '</div></div>';
   });
   el.innerHTML = html;
+}
+
+// ════════════════════════════════════════
+// GENERAR CONTRATO PDF
+// ════════════════════════════════════════
+function generarContrato(id) {
+  var d = null;
+  for (var i=0; i<D.dineroPrestado.length; i++) {
+    if (D.dineroPrestado[i].id === id) { d = D.dineroPrestado[i]; break; }
+  }
+  if (!d) return;
+
+  var n = d.plazoMeses || 1;
+  var totalRecibir = (d.montoRecibir && d.montoRecibir > d.monto)
+    ? d.montoRecibir
+    : d.monto + (d.monto*(d.interes||0)/100*n/12);
+  var ganancia = totalRecibir - d.monto;
+  var cuotaMes = totalRecibir / n;
+  var hoy = new Date();
+  var fechaStr = hoy.toLocaleDateString('es-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  var mesInicio = d.mesInicio || 0;
+  var MESES_ESP = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  // Generar tabla de pagos
+  var filasTabla = '';
+  for (var mi=0; mi<n; mi++) {
+    var mesReal = (mesInicio + mi) % 12;
+    var anio = hoy.getFullYear() + Math.floor((mesInicio + mi) / 12);
+    filasTabla += '<tr style="background:' + (mi%2===0?'#F8FAFC':'#fff') + '">' +
+      '<td style="padding:6px 10px;border:1px solid #CBD5E1;text-align:center">' + (mi+1) + '</td>' +
+      '<td style="padding:6px 10px;border:1px solid #CBD5E1">' + MESES_ESP[mesReal] + ' ' + anio + '</td>' +
+      '<td style="padding:6px 10px;border:1px solid #CBD5E1;text-align:right;font-family:monospace">$' + cuotaMes.toFixed(2) + '</td>' +
+      '<td style="padding:6px 10px;border:1px solid #CBD5E1;text-align:center">___________</td>' +
+    '</tr>';
+  }
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<style>' +
+    'body{font-family:Georgia,serif;margin:40px;color:#1A1A2E;line-height:1.6}' +
+    'h1{text-align:center;font-size:20px;color:#0B2A4A;border-bottom:3px solid #0B2A4A;padding-bottom:10px;margin-bottom:5px}' +
+    'h2{text-align:center;font-size:13px;color:#6B7280;margin-top:0;font-weight:normal}' +
+    'h3{font-size:13px;color:#0B2A4A;margin-top:20px;margin-bottom:5px;border-left:4px solid #1E8449;padding-left:8px}' +
+    '.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0}' +
+    '.info-box{background:#F0F4F8;border-radius:6px;padding:10px 14px}' +
+    '.info-box label{font-size:10px;color:#6B7280;font-weight:bold;text-transform:uppercase;display:block}' +
+    '.info-box span{font-size:14px;font-weight:bold;color:#0B2A4A}' +
+    '.monto-box{background:linear-gradient(135deg,#0B2A4A,#1F4E78);color:white;border-radius:8px;padding:14px;text-align:center;margin:15px 0}' +
+    '.monto-box .label{font-size:11px;opacity:.7;text-transform:uppercase}' +
+    '.monto-box .valor{font-size:28px;font-weight:bold;font-family:monospace}' +
+    '.monto-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:15px 0}' +
+    '.monto-card{border:2px solid #CBD5E1;border-radius:6px;padding:10px;text-align:center}' +
+    '.monto-card .lbl{font-size:10px;color:#6B7280;font-weight:bold;text-transform:uppercase}' +
+    '.monto-card .val{font-size:18px;font-weight:bold}' +
+    'table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px}' +
+    'th{background:#0B2A4A;color:white;padding:8px 10px;text-align:left}' +
+    '.clausula{background:#FFF9E6;border:1px solid #F4B942;border-radius:6px;padding:12px;margin:12px 0;font-size:12px}' +
+    '.small-claims{background:#FFF5F5;border:2px solid #C0392B;border-radius:6px;padding:12px;margin:12px 0}' +
+    '.small-claims h4{color:#C0392B;margin:0 0 8px 0;font-size:13px}' +
+    '.firma-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:30px}' +
+    '.firma-box{text-align:center}' +
+    '.firma-linea{border-top:2px solid #0B2A4A;margin-top:50px;padding-top:6px;font-size:11px;color:#6B7280}' +
+    '.footer{text-align:center;font-size:10px;color:#6B7280;margin-top:20px;border-top:1px solid #CBD5E1;padding-top:10px}' +
+    '.sello{border:3px solid #0B2A4A;border-radius:50%;width:80px;height:80px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;color:#0B2A4A;font-weight:bold}' +
+    '@media print{body{margin:20px}}' +
+    '</style></head><body>' +
+
+    '<h1>CONTRATO DE PRÉSTAMO PERSONAL</h1>' +
+    '<h2>Documento Legal Privado — Richmond, California</h2>' +
+
+    '<div style="text-align:right;font-size:11px;color:#6B7280;margin-bottom:15px">' +
+      '<strong>Fecha de creación:</strong> ' + fechaStr + '<br>' +
+      '<strong>Número de contrato:</strong> SC-' + id.toString().slice(-6) +
+    '</div>' +
+
+    '<h3>PARTES DEL CONTRATO</h3>' +
+    '<div class="info-grid">' +
+      '<div class="info-box">' +
+        '<label>PRESTAMISTA (quien presta)</label>' +
+        '<span>Efraín Soza</span><br>' +
+        '<small style="color:#6B7280">Richmond, California<br>efrainsoza2026@github.io</small>' +
+      '</div>' +
+      '<div class="info-box">' +
+        '<label>DEUDOR (quien recibe)</label>' +
+        '<span>' + d.nombre + '</span><br>' +
+        '<small style="color:#6B7280">Dirección: ________________________<br>Tel: ________________________</small>' +
+      '</div>' +
+    '</div>' +
+
+    '<h3>TÉRMINOS DEL PRÉSTAMO</h3>' +
+    '<div class="monto-row">' +
+      '<div class="monto-card" style="border-color:#1E8449">' +
+        '<div class="lbl">Monto Prestado</div>' +
+        '<div class="val" style="color:#1E8449">$' + d.monto.toLocaleString() + '</div>' +
+      '</div>' +
+      '<div class="monto-card" style="border-color:#1F4E78">' +
+        '<div class="lbl">Total a Devolver</div>' +
+        '<div class="val" style="color:#1F4E78">$' + totalRecibir.toFixed(2) + '</div>' +
+      '</div>' +
+      '<div class="monto-card" style="border-color:#F4B942">' +
+        '<div class="lbl">Interés / Ganancia</div>' +
+        '<div class="val" style="color:#E67E22">+$' + ganancia.toFixed(2) + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="info-grid">' +
+      '<div class="info-box"><label>Plazo</label><span>' + n + ' mes' + (n>1?'es':'') + '</span></div>' +
+      '<div class="info-box"><label>Cuota Mensual</label><span>$' + cuotaMes.toFixed(2) + '</span></div>' +
+      '<div class="info-box"><label>Mes de Inicio</label><span>' + MESES_ESP[mesInicio] + ' ' + hoy.getFullYear() + '</span></div>' +
+      '<div class="info-box"><label>Tasa de Interés</label><span>' + (d.interes||0).toFixed(1) + '% anual</span></div>' +
+    '</div>' +
+
+    '<h3>TABLA DE PAGOS</h3>' +
+    '<table><thead><tr><th>#</th><th>Mes</th><th>Cuota a Pagar</th><th>Firma de Pago</th></tr></thead><tbody>' +
+    filasTabla + '</tbody></table>' +
+
+    '<h3>ACUERDO Y OBLIGACIONES</h3>' +
+    '<div class="clausula">' +
+      '<p style="margin:0;font-size:12px">Yo, <strong>' + d.nombre + '</strong>, en pleno uso de mis facultades, acepto haber recibido la cantidad de <strong>$' + d.monto.toLocaleString() + ' dólares</strong> en calidad de préstamo personal de parte de <strong>Efraín Soza</strong>, y me comprometo a devolver la cantidad total de <strong>$' + totalRecibir.toFixed(2) + ' dólares</strong> en un plazo de <strong>' + n + ' mes' + (n>1?'es':'') + '</strong>, mediante pagos mensuales de <strong>$' + cuotaMes.toFixed(2) + '</strong>, comenzando en <strong>' + MESES_ESP[mesInicio] + ' ' + hoy.getFullYear() + '</strong>.</p>' +
+      '<p style="margin:8px 0 0 0;font-size:12px">El incumplimiento de cualquier pago generará intereses moratorios y podrá resultar en acción legal inmediata.</p>' +
+    '</div>' +
+
+    '<div class="small-claims">' +
+      '<h4>⚖️ CLÁUSULA DE SMALL CLAIMS COURT (Corte de Reclamos Menores)</h4>' +
+      '<p style="font-size:11px;margin:0">En caso de incumplimiento total o parcial de este contrato, el prestamista <strong>Efraín Soza</strong> se reserva el derecho de presentar una demanda ante el <strong>Small Claims Court del Condado de Contra Costa, California</strong>, de conformidad con el Código de Procedimiento Civil de California §116.110 et seq.</p>' +
+      '<p style="font-size:11px;margin:8px 0 0 0"><strong>Corte:</strong> Contra Costa County Superior Court — Richmond Courthouse<br>' +
+      '<strong>Dirección:</strong> 100 37th Street, Richmond, CA 94805<br>' +
+      '<strong>Límite Small Claims:</strong> Hasta $12,500 sin necesidad de abogado<br>' +
+      '<strong>Teléfono:</strong> (925) 608-1000</p>' +
+      '<p style="font-size:11px;margin:8px 0 0 0">Este contrato constituye evidencia suficiente para iniciar un proceso en Small Claims Court. El deudor acepta que cualquier disputa será resuelta en la jurisdicción del Condado de Contra Costa, California.</p>' +
+    '</div>' +
+
+    '<h3>FIRMAS</h3>' +
+    '<div class="firma-grid">' +
+      '<div class="firma-box">' +
+        '<div class="firma-linea"><strong>DEUDOR</strong><br>' + d.nombre + '<br>Fecha: _______________</div>' +
+      '</div>' +
+      '<div class="firma-box">' +
+        '<div class="firma-linea"><strong>PRESTAMISTA</strong><br>Efraín Soza<br>Fecha: _______________</div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div style="margin-top:20px;border:1px solid #CBD5E1;border-radius:6px;padding:12px">' +
+      '<strong style="font-size:11px;color:#6B7280">TESTIGO (opcional):</strong>' +
+      '<div class="firma-grid" style="margin-top:10px">' +
+        '<div class="firma-box"><div class="firma-linea">Nombre: _______________<br>Firma: _______________</div></div>' +
+        '<div class="firma-box"><div class="firma-linea">Fecha: _______________<br>Tel: _______________</div></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="footer">' +
+      'Contrato generado por Soza Capital — ' + fechaStr + '<br>' +
+      'Número de contrato: SC-' + id.toString().slice(-6) + ' — Richmond, California — efrainsoza2026.github.io/sozacapital' +
+    '</div>' +
+    '</body></html>';
+
+  // Abrir en nueva ventana para imprimir/guardar como PDF
+  var ventana = window.open('', '_blank');
+  if (ventana) {
+    ventana.document.write(html);
+    ventana.document.close();
+    ventana.focus();
+    setTimeout(function() { ventana.print(); }, 800);
+  } else {
+    // Si el popup está bloqueado, descargar como HTML
+    var blob = new Blob([html], {type:'text/html'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href   = url;
+    a.download = 'Contrato_' + d.nombre.replace(/\s+/g,'_') + '_' + hoy.toISOString().slice(0,10) + '.html';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('📄 Contrato descargado — ábrelo en Chrome e imprime como PDF');
+  }
 }
 
 // ════════════════════════════════════════
