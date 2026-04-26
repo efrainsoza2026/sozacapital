@@ -319,6 +319,7 @@ body.dark .bb { opacity:.9; }
   <div class="ndiv"></div>
   <div class="nav-s">Más</div>
   <div class="nb" onclick="ir('dineroPrestado')"><span class="ic">🤝</span>Dinero Prestado</div>
+  <div class="nb" onclick="ir('notas')"><span class="ic">📝</span>Notas Personales</div>
   <div class="nb" onclick="ir('gastosDiarios')"><span class="ic">💰</span>Gastos Diarios</div>
   <div class="nb" onclick="ir('calendario')"><span class="ic">📅</span>Calendario Pagos</div>
   <div class="nb" onclick="ir('inversiones')"><span class="ic">📈</span>Inversiones</div>
@@ -550,6 +551,34 @@ body.dark .bb { opacity:.9; }
           <button onclick="nuevoPagoCalendario()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:3px 11px;border-radius:5px;cursor:pointer;font-size:11px;font-weight:700">+ Agregar</button>
         </div>
         <div id="calLista"></div>
+      </div>
+    </div>
+
+    <!-- NOTAS PERSONALES -->
+    <div class="sec" id="sec-notas">
+      <div class="kgrid">
+        <div class="kpi"><div class="kl">Total Notas</div><div class="kv" id="notKT">0</div></div>
+        <div class="kpi g"><div class="kl">Vehículos</div><div class="kv" id="notKV">0</div></div>
+        <div class="kpi t"><div class="kl">Propiedades</div><div class="kv" id="notKP">0</div></div>
+        <div class="kpi a"><div class="kl">Casos / Legal</div><div class="kv" id="notKC">0</div></div>
+      </div>
+      <div class="card">
+        <div class="ch" style="background:linear-gradient(135deg,#2C3E50,#4A6FA5)">
+          <h3>📝 Notas Personales</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="notBuscar" placeholder="🔍 Buscar..." onkeyup="rNotas()" style="padding:4px 10px;border-radius:20px;border:none;font-size:11px;outline:none;width:130px">
+            <button onclick="nuevaNota()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:3px 11px;border-radius:5px;cursor:pointer;font-size:11px;font-weight:700">+ Nueva Nota</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;padding:10px 14px;flex-wrap:wrap;border-bottom:1px solid var(--border)" id="notFiltros">
+          <button onclick="setFiltroNota('todas')" class="filtro-btn on" data-cat="todas" style="padding:4px 12px;border-radius:20px;border:none;cursor:pointer;font-size:11px;font-weight:600">📋 Todas</button>
+          <button onclick="setFiltroNota('Vehículos')" class="filtro-btn" data-cat="Vehículos" style="padding:4px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:11px;background:var(--white)">🚗 Vehículos</button>
+          <button onclick="setFiltroNota('Propiedades')" class="filtro-btn" data-cat="Propiedades" style="padding:4px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:11px;background:var(--white)">🏠 Propiedades</button>
+          <button onclick="setFiltroNota('Casos Legales')" class="filtro-btn" data-cat="Casos Legales" style="padding:4px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:11px;background:var(--white)">⚖️ Casos</button>
+          <button onclick="setFiltroNota('Patrimonio')" class="filtro-btn" data-cat="Patrimonio" style="padding:4px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:11px;background:var(--white)">💼 Patrimonio</button>
+          <button onclick="setFiltroNota('General')" class="filtro-btn" data-cat="General" style="padding:4px 12px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:11px;background:var(--white)">📋 General</button>
+        </div>
+        <div id="notLista" style="padding:13px"></div>
       </div>
     </div>
 
@@ -855,6 +884,7 @@ var D = {
   pagosCalendario: [],
   inversiones: [],
   dineroPrestado: [],
+  notas: [],
   darkMode: false,
   inquilinos_estado: [
     {nombre:'Mario Zapata',     prop:'2011 Market Ave 314, San Pablo', monto:2100, estado:[0,0,0,0,0,0,0,0,0,0,0,0], fechaCorte:1},
@@ -1083,13 +1113,13 @@ function putEl(id, html) { var e = document.getElementById(id); if (e) e.innerHT
 // ════════════════════════════════════════
 // RENDER ALL
 // ════════════════════════════════════════
-function renderAll() { rPortada(); rDash(); rTarjetas(); rIngresos(); rGastos(); rDep(); rHip(); rPrest(); rSeg(); rGraf(); rRec(); rGastosDiarios(); rCalendario(); rInversiones(); rDineroPrestado(); }
+function renderAll() { rPortada(); rDash(); rTarjetas(); rIngresos(); rGastos(); rDep(); rHip(); rPrest(); rSeg(); rGraf(); rRec(); rGastosDiarios(); rCalendario(); rInversiones(); rDineroPrestado(); rNotas(); }
 function rSec(id) {
   var fns = {
     portada:rPortada, dashboard:rDash, tarjetas:rTarjetas, ingresos:rIngresos,
     gastos:rGastos, depositos:rDep, hipotecas:rHip, prestamos:rPrest,
     seguros:rSeg, graficos:rGraf, recomendaciones:rRec,
-    gastosDiarios:rGastosDiarios, calendario:rCalendario, inversiones:rInversiones, dineroPrestado:rDineroPrestado
+    gastosDiarios:rGastosDiarios, calendario:rCalendario, inversiones:rInversiones, dineroPrestado:rDineroPrestado, notas:rNotas
   };
   if (fns[id]) fns[id]();
 }
@@ -2593,6 +2623,7 @@ TITULOS.gastosDiarios = 'Gastos Diarios';
 TITULOS.calendario = 'Calendario de Pagos';
 TITULOS.inversiones = 'Inversiones';
 TITULOS.dineroPrestado = 'Dinero Prestado';
+TITULOS.notas = 'Notas Personales';
 TITULOS.metas = 'Metas de Ahorro';
 TITULOS.calculadora = 'Calculadora de Deuda';
 TITULOS.historial = 'Historial Credit Score';
@@ -2601,6 +2632,199 @@ TITULOS.proyeccion = 'Proyección Año';
 TITULOS.alertas = 'Alertas Financieras';
 TITULOS.reporte = 'Reporte Mensual';
 
+
+// ════════════════════════════════════════
+// NOTAS PERSONALES
+// ════════════════════════════════════════
+var filtroNotaActual = 'todas';
+
+var CAT_NOTAS = [
+  {id:'Vehículos',    ic:'🚗', color:'#2980B9'},
+  {id:'Propiedades',  ic:'🏠', color:'#117A65'},
+  {id:'Casos Legales',ic:'⚖️', color:'#7D3C98'},
+  {id:'Patrimonio',   ic:'💼', color:'#E67E22'},
+  {id:'General',      ic:'📋', color:'#6B7280'},
+];
+
+function getCatInfo(cat) {
+  for (var i=0; i<CAT_NOTAS.length; i++) {
+    if (CAT_NOTAS[i].id === cat) return CAT_NOTAS[i];
+  }
+  return {id:'General', ic:'📋', color:'#6B7280'};
+}
+
+function nuevaNota() {
+  if (!D.notas) D.notas = [];
+  var hoy = new Date().toISOString().slice(0,10);
+  D.notas.unshift({
+    id: Date.now(),
+    titulo: 'Nueva Nota',
+    categoria: 'General',
+    texto: '',
+    fecha: hoy,
+    editada: hoy,
+    editando: true
+  });
+  rNotas(); autoguardar();
+}
+
+function elimNota(id) {
+  if (!confirm('¿Eliminar esta nota?')) return;
+  D.notas = D.notas.filter(function(n){return n.id!==id;});
+  rNotas(); autoguardar();
+}
+
+function setFiltroNota(cat) {
+  filtroNotaActual = cat;
+  document.querySelectorAll('.filtro-btn').forEach(function(b) {
+    var esCat = b.getAttribute('data-cat') === cat;
+    b.style.background = esCat ? 'var(--navy)' : 'var(--white)';
+    b.style.color = esCat ? '#fff' : '';
+    b.style.border = esCat ? 'none' : '1px solid var(--border)';
+  });
+  rNotas();
+}
+
+function chgNota(el) {
+  var id = parseInt(el.getAttribute('data-id'));
+  var f  = el.getAttribute('data-f');
+  D.notas.forEach(function(n) {
+    if (n.id === id) {
+      n[f] = el.value;
+      n.editada = new Date().toISOString().slice(0,10);
+    }
+  });
+  if (f !== 'texto') rNotas();
+  autoguardar();
+}
+
+function toggleEditNota(id) {
+  D.notas.forEach(function(n) {
+    if (n.id === id) n.editando = !n.editando;
+  });
+  rNotas();
+}
+
+function imprimirNotas() {
+  var notas = D.notas;
+  if (filtroNotaActual !== 'todas') {
+    notas = notas.filter(function(n){return n.categoria===filtroNotaActual;});
+  }
+  var busq = document.getElementById('notBuscar');
+  if (busq && busq.value) {
+    var q = busq.value.toLowerCase();
+    notas = notas.filter(function(n){return (n.titulo+n.texto).toLowerCase().indexOf(q)>-1;});
+  }
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+    '<style>body{font-family:Arial,sans-serif;margin:30px;color:#1A1A2E}' +
+    'h1{color:#0B2A4A;border-bottom:3px solid #0B2A4A;padding-bottom:8px}' +
+    '.nota{border:1px solid #CBD5E1;border-radius:8px;padding:14px;margin-bottom:14px;page-break-inside:avoid}' +
+    '.nota-cat{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:bold;color:#fff;margin-bottom:6px}' +
+    '.nota-titulo{font-size:16px;font-weight:bold;margin-bottom:4px}' +
+    '.nota-fecha{font-size:10px;color:#6B7280;margin-bottom:8px}' +
+    '.nota-texto{font-size:13px;line-height:1.6;white-space:pre-wrap}' +
+    '@media print{body{margin:15px}}' +
+    '</style></head><body>' +
+    '<h1>📝 Notas Personales — Efraín Enrique Centeno Soza</h1>' +
+    '<p style="color:#6B7280;font-size:11px">Generado: ' + new Date().toLocaleDateString('es-US',{year:'numeric',month:'long',day:'numeric'}) + ' | ' + notas.length + ' nota(s)</p>';
+  for (var i=0; i<notas.length; i++) {
+    var n = notas[i];
+    var ci = getCatInfo(n.categoria);
+    html += '<div class="nota">' +
+      '<div class="nota-cat" style="background:' + ci.color + '">' + ci.ic + ' ' + n.categoria + '</div>' +
+      '<div class="nota-titulo">' + (n.titulo||'Sin título') + '</div>' +
+      '<div class="nota-fecha">Creada: ' + n.fecha + (n.editada!==n.fecha?' | Editada: '+n.editada:'') + '</div>' +
+      '<div class="nota-texto">' + (n.texto||'(sin contenido)').replace(/</g,'&lt;') + '</div>' +
+      '</div>';
+  }
+  html += '</body></html>';
+  var v = window.open('','_blank');
+  if (v) { v.document.write(html); v.document.close(); setTimeout(function(){v.print();},600); }
+}
+
+function rNotas() {
+  if (!D.notas) D.notas = [];
+  var el = document.getElementById('notLista'); if (!el) return;
+
+  // KPIs
+  var tots = D.notas.length;
+  var veh  = D.notas.filter(function(n){return n.categoria==='Vehículos';}).length;
+  var prop = D.notas.filter(function(n){return n.categoria==='Propiedades';}).length;
+  var cas  = D.notas.filter(function(n){return n.categoria==='Casos Legales';}).length;
+  var notKT=document.getElementById('notKT'); if(notKT) notKT.textContent=tots;
+  var notKV=document.getElementById('notKV'); if(notKV) notKV.textContent=veh;
+  var notKP=document.getElementById('notKP'); if(notKP) notKP.textContent=prop;
+  var notKC=document.getElementById('notKC'); if(notKC) notKC.textContent=cas;
+
+  // Filtrar
+  var lista = D.notas.slice();
+  if (filtroNotaActual !== 'todas') {
+    lista = lista.filter(function(n){return n.categoria===filtroNotaActual;});
+  }
+  var busq = document.getElementById('notBuscar');
+  if (busq && busq.value) {
+    var q = busq.value.toLowerCase();
+    lista = lista.filter(function(n){return (n.titulo+n.texto).toLowerCase().indexOf(q)>-1;});
+  }
+
+  if (!lista.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:28px">' +
+      (D.notas.length ? 'No hay notas en esta categoría.' : 'Sin notas. Presiona <strong>+ Nueva Nota</strong>.') +
+      '</div>';
+    return;
+  }
+
+  var html = '';
+  for (var i=0; i<lista.length; i++) {
+    var n = lista[i];
+    var ci = getCatInfo(n.categoria);
+    var catOpts = CAT_NOTAS.map(function(c){
+      return '<option value="'+c.id+'"'+(c.id===n.categoria?' selected':'')+'>'+c.ic+' '+c.id+'</option>';
+    }).join('');
+
+    if (n.editando) {
+      // Modo edición
+      html += '<div style="border:2px solid ' + ci.color + ';border-radius:10px;padding:14px;margin-bottom:12px;background:var(--white)">' +
+        '<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">' +
+          '<input class="inp tx" type="text" value="' + (n.titulo||'') + '" placeholder="Título de la nota" style="flex:1;font-size:14px;font-weight:700;padding:6px 10px;min-width:150px" data-id="' + n.id + '" data-f="titulo" onchange="chgNota(this)">' +
+          '<select style="padding:5px 10px;border:1.5px solid var(--amber2);border-radius:5px;font-size:12px;outline:none;background:var(--white);cursor:pointer" data-id="' + n.id + '" data-f="categoria" onchange="chgNota(this)">' + catOpts + '</select>' +
+        '</div>' +
+        '<textarea placeholder="Escribe aquí tus notas... Puedes escribir sobre tu carro, casos, propiedades, patrimonio, ideas o lo que necesites." style="width:100%;min-height:140px;padding:10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:DM Sans,sans-serif;resize:vertical;outline:none;line-height:1.6;color:var(--text);background:var(--white)" data-id="' + n.id + '" data-f="texto" onchange="chgNota(this)" oninput="chgNota(this)">' + (n.texto||'') + '</textarea>' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">' +
+          '<span style="font-size:9px;color:var(--muted)">Creada: ' + n.fecha + (n.editada!==n.fecha?' | Editada: '+n.editada:'') + '</span>' +
+          '<div style="display:flex;gap:6px">' +
+            '<button onclick="toggleEditNota(' + n.id + ')" style="background:var(--navy);color:#fff;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:12px;font-weight:700">✅ Guardar</button>' +
+            '<button onclick="elimNota(' + n.id + ')" style="background:#FEE2E2;color:var(--red);border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700">🗑️</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    } else {
+      // Modo vista
+      var preview = (n.texto||'').slice(0,120) + ((n.texto||'').length>120?'...':'');
+      html += '<div style="border:1px solid var(--border);border-left:4px solid ' + ci.color + ';border-radius:8px;padding:13px;margin-bottom:10px;background:var(--white);cursor:pointer" onclick="toggleEditNota(' + n.id + ')">' +
+        '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:5px">' +
+          '<div>' +
+            '<span style="display:inline-block;background:' + ci.color + ';color:#fff;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;margin-bottom:4px">' + ci.ic + ' ' + n.categoria + '</span>' +
+            '<div style="font-size:14px;font-weight:700;color:var(--navy)">' + (n.titulo||'Sin título') + '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:5px">' +
+            '<button onclick="event.stopPropagation();toggleEditNota(' + n.id + ')" style="background:var(--silver);border:none;border-radius:5px;padding:4px 9px;cursor:pointer;font-size:11px">✏️</button>' +
+            '<button onclick="event.stopPropagation();elimNota(' + n.id + ')" style="background:#FEE2E2;color:var(--red);border:none;border-radius:5px;padding:4px 9px;cursor:pointer;font-size:11px">🗑️</button>' +
+          '</div>' +
+        '</div>' +
+        (preview ? '<div style="font-size:12px;color:var(--muted);line-height:1.5">' + preview.replace(/</g,'&lt;') + '</div>' : '<div style="font-size:11px;color:#CBD5E1;font-style:italic">Toca para agregar texto...</div>') +
+        '<div style="font-size:9px;color:var(--muted);margin-top:5px">📅 ' + n.fecha + (n.editada!==n.fecha?' | ✏️ '+n.editada:'') + '</div>' +
+      '</div>';
+    }
+  }
+
+  // Botón imprimir notas
+  html += '<div style="text-align:center;margin-top:10px">' +
+    '<button onclick="imprimirNotas()" style="background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:12px;font-weight:700;cursor:pointer">🖨️ Imprimir Notas</button>' +
+  '</div>';
+
+  el.innerHTML = html;
+}
 
 // ════════════════════════════════════════
 // DINERO PRESTADO
@@ -3337,6 +3561,7 @@ ir = function(id) {
   if (!D.pagosCalendario)  D.pagosCalendario = [];
   if (!D.inversiones)      D.inversiones = [];
   if (!D.dineroPrestado)   D.dineroPrestado = [];
+  if (!D.notas)            D.notas = [];
   if (D.darkMode) aplicarDark();
   updScore(D.score || 719);
   renderAll();
