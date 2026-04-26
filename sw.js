@@ -1,4 +1,4 @@
-const CACHE = 'soza-capital-v14';
+const CACHE = 'soza-capital-v15';
 const FILES = [
   './',
   './index.html',

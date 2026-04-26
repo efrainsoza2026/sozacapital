@@ -2631,18 +2631,10 @@ function chgDP(el) {
   var f   = el.getAttribute('data-f');
   D.dineroPrestado.forEach(function(d) {
     if (d.id === id) {
-      if (f==='nombre'||f==='estado') d[f] = el.value;
-      else d[f] = parseFloat(el.value) || 0;
-
-      // Recalcular interés si hay montoRecibir definido
-      if ((f === 'montoRecibir' || f === 'plazoMeses' || f === 'monto') &&
-           d.montoRecibir && d.montoRecibir > d.monto && d.monto > 0) {
-        var n = d.plazoMeses || 1;
-        var ganancia = d.montoRecibir - d.monto;
-        var tasaAnual = (ganancia / d.monto) * (12 / n) * 100;
-        d.interes = Math.round(tasaAnual * 100) / 100;
-        var inpInteres = document.querySelector('[data-id="' + id + '"][data-f="interes"]');
-        if (inpInteres) inpInteres.value = d.interes;
+      if (f==='nombre'||f==='estado'||f==='direccionDeudor'||f==='telDeudor') {
+        d[f] = el.value;
+      } else {
+        d[f] = parseFloat(el.value) || 0;
       }
       // Si cambia interés manualmente, limpiar montoRecibir
       if (f === 'interes') {
@@ -2650,6 +2642,16 @@ function chgDP(el) {
         var inpMR = document.querySelector('[data-id="' + id + '"][data-f="montoRecibir"]');
         if (inpMR) inpMR.value = '';
       }
+    }
+  });
+  // Recalcular interés SIEMPRE que haya montoRecibir, monto y plazo válidos
+  D.dineroPrestado.forEach(function(d) {
+    if (d.id === id && d.montoRecibir > 0 && d.monto > 0 && d.montoRecibir > d.monto && f !== 'interes') {
+      var n = d.plazoMeses || 1;
+      var ganancia = d.montoRecibir - d.monto;
+      d.interes = Math.round((ganancia / d.monto) * (12 / n) * 100 * 100) / 100;
+      var inpInteres = document.querySelector('[data-id="' + id + '"][data-f="interes"]');
+      if (inpInteres) inpInteres.value = d.interes;
     }
   });
   rDineroPrestado(); autoguardar();
