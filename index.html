@@ -1533,14 +1533,16 @@ function rPrest() {
 
     var amRows = '';
     var sal = p.s0, tP=0, tI=0, tC=0;
-    for (var mi=0; mi<12; mi++) {
+    var totalMeses = Math.max(1, p.meses || 12);
+    for (var mi=0; mi<totalMeses && sal>0.01; mi++) {
       var pg = p.pm[mi] || 0;
       var iM = r > 0 ? sal * r : 0;
       var cap = Math.max(0, pg - iM);
       var sF = Math.max(0, sal - cap);
       tP += pg; tI += iM; tC += cap;
-      var hl = mi === MA ? ' style="background:#EBF5FB;font-weight:600"' : '';
-      amRows += '<tr' + hl + '><td>' + MESES[mi] + '</td><td class="r">' + f$(sal) + '</td>' +
+      var mesNombre = mi < 12 ? MESES[mi] : 'Mes ' + (mi+1);
+      var hl = (mi % 12) === MA ? ' style="background:#EBF5FB;font-weight:600"' : '';
+      amRows += '<tr' + hl + '><td>' + mesNombre + '</td><td class="r">' + f$(sal) + '</td>' +
         '<td class="r" style="color:' + (pg>0?'var(--teal)':'var(--muted)') + '">' + f$(pg) + '</td>' +
         '<td class="r" style="color:var(--red)">' + f$(iM) + '</td>' +
         '<td class="r" style="color:var(--green)">' + f$(cap) + '</td>' +
@@ -1549,8 +1551,9 @@ function rPrest() {
     }
 
     var mInputs = '';
-    for (var mi2=0; mi2<12; mi2++) {
-      mInputs += '<div class="miw"><label>' + MESES[mi2].slice(0,3) + '</label><input class="inp" type="number" value="' + (p.pm[mi2]||'') + '" placeholder="0" data-pi="' + pi + '" data-mi="' + mi2 + '" onchange="chgPrestPago(this)"></div>';
+    for (var mi2=0; mi2<totalMeses; mi2++) {
+      var mn = mi2 < 12 ? MESES[mi2].slice(0,3) : 'M'+(mi2+1);
+      mInputs += '<div class="miw"><label>' + mn + '</label><input class="inp" type="number" value="' + (p.pm[mi2]||'') + '" placeholder="0" data-pi="' + pi + '" data-mi="' + mi2 + '" onchange="chgPrestPago(this)"></div>';
     }
 
     html += '<div style="margin:12px">' +
@@ -1601,6 +1604,11 @@ function chgPrestDato(el) {
   var pi = parseInt(el.getAttribute('data-pi'));
   var f = el.getAttribute('data-f');
   D.prestamos[pi][f] = f === 'n' ? el.value : (parseFloat(el.value) || 0);
+  if (f === 'meses') {
+    var nuevosMeses = parseInt(el.value) || 12;
+    if (!D.prestamos[pi].pm) D.prestamos[pi].pm = [];
+    while (D.prestamos[pi].pm.length < nuevosMeses) D.prestamos[pi].pm.push(0);
+  }
   rPrest(); rPortada(); autoguardar();
 }
 
