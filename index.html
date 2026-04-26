@@ -171,6 +171,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#1A1A2E;min-hei
 }
 
 
+
+/* ── MODO OSCURO ─────────────────────────────────── */
+body.dark {
+  --bg:#0F1923; --white:#1A2535; --card:#1A2535;
+  --border:#2A3A4A; --text:#E2E8F0; --muted:#8899AA;
+  --silver:#1F3044; --navy:#0B2A4A;
+}
+body.dark .topbar { background:#1A2535; border-color:#2A3A4A; }
+body.dark .tb-title { color:#E2E8F0; }
+body.dark .kpi { background:#1A2535; border-color:#2A3A4A; }
+body.dark .kv { color:#E2E8F0; }
+body.dark .card { background:#1A2535; border-color:#2A3A4A; }
+body.dark .tbl th { background:#0F1923; color:#8899AA; }
+body.dark .tbl td { border-color:#2A3A4A; color:#E2E8F0; }
+body.dark .tbl tr:hover td { background:#1F2F3F; }
+body.dark .inp { background:#0F1923; border-color:#2A3A4A; color:#FFE599; }
+body.dark .pstat { background:#1A2535; border-color:#2A3A4A; }
+body.dark .psl { color:#8899AA; }
+body.dark .psv { color:#E2E8F0; }
+body.dark .meta-card { background:#1A2535; border-color:#2A3A4A; }
+body.dark .ri { background:#1A2535; border-color:#2A3A4A; }
+body.dark .cbox { background:#1A2535; border-color:#2A3A4A; }
+body.dark .cbox h4 { color:#E2E8F0; }
+body.dark .bar { background:#2A3A4A; }
+body.dark .content { background:#0F1923; }
+body.dark select { background:#1A2535; color:#E2E8F0; border-color:#2A3A4A; }
+body.dark .ac { background:linear-gradient(135deg,#0F1923,#1A2535); }
+body.dark .bb { opacity:.9; }
+
 /* ── MÓVIL RESPONSIVO ─────────────────────────────── */
 @media (max-width: 768px) {
   .sb {
@@ -288,6 +317,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#1A1A2E;min-hei
   <div class="nb" onclick="ir('graficos')"><span class="ic">📈</span>Gráficos</div>
   <div class="nb" onclick="ir('recomendaciones')"><span class="ic">💡</span>Recomendaciones</div>
   <div class="ndiv"></div>
+  <div class="nav-s">Más</div>
+  <div class="nb" onclick="ir('gastosDiarios')"><span class="ic">💰</span>Gastos Diarios</div>
+  <div class="nb" onclick="ir('calendario')"><span class="ic">📅</span>Calendario Pagos</div>
+  <div class="nb" onclick="ir('inversiones')"><span class="ic">📈</span>Inversiones</div>
+  <div class="ndiv"></div>
+  <div class="nb" onclick="toggleDark()" id="darkBtn"><span class="ic">🌙</span><span id="darkTxt">Modo Oscuro</span></div>
+  <div class="ndiv"></div>
   <div class="nav-s">Imprimir</div>
   <div class="nb" onclick="window.print();toggleMenu()"><span class="ic">🖨</span>Imprimir Sección</div>
   <div class="nb" onclick="imprimirTodo();toggleMenu()"><span class="ic">📄</span>Imprimir Todo</div>
@@ -309,6 +345,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#1A1A2E;min-hei
       <button class="menu-btn" id="menuBtn" onclick="toggleMenu()">☰</button>
       <div class="tb-title" id="tbtitle">Portada</div>
     </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div id="relojTopbar" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--navy);background:var(--silver);padding:4px 10px;border-radius:20px;letter-spacing:.03em"></div>
     <div class="tb-right">
       <span class="badge" id="mesLbl">Enero</span>
       <button class="btn" onclick="window.print()">🖨 Sección</button>
@@ -325,6 +363,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#1A1A2E;min-hei
       <div class="hero">
         <h1>Soza Capital</h1>
         <p>Efraín Soza · Richmond, California · 2025–2026</p>
+        <div id="relojPortada" style="margin-top:14px;display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:10px 18px">
+          <div id="relojHora" style="font-family:'DM Mono',monospace;font-size:32px;font-weight:500;color:var(--amber);line-height:1"></div>
+          <div id="relojFecha" style="font-size:12px;color:rgba(255,255,255,.7);margin-top:3px"></div>
+        </div>
         <div class="hero-sc">
           <div class="hsl">
             <label>CREDIT SCORE</label>
@@ -445,6 +487,87 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#1A1A2E;min-hei
           <button onclick="nuevoSeg()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:3px 11px;border-radius:5px;cursor:pointer;font-size:11px;font-weight:700">+ Agregar</button>
         </div>
         <div id="segLista"></div>
+      </div>
+    </div>
+
+
+    <!-- GASTOS DIARIOS -->
+    <div class="sec" id="sec-gastosDiarios">
+      <div class="kgrid">
+        <div class="kpi r"><div class="kl">Gasto Hoy</div><div class="kv" id="gdKH">$0</div></div>
+        <div class="kpi"><div class="kl">Esta Semana</div><div class="kv" id="gdKS">$0</div></div>
+        <div class="kpi a"><div class="kl">Este Mes</div><div class="kv" id="gdKM">$0</div></div>
+        <div class="kpi g"><div class="kl">Registros</div><div class="kv" id="gdKC">0</div></div>
+      </div>
+      <div class="card">
+        <div class="ch a">
+          <h3>💰 Registrar Gasto del Día</h3>
+        </div>
+        <div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px">Descripción</div>
+            <input class="inp tx" type="text" id="gdDesc" placeholder="Ej: Gasolina, comida..." style="font-size:14px;padding:7px 10px">
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px">Monto ($)</div>
+            <input class="inp" type="number" id="gdMonto" placeholder="0" style="font-size:14px;padding:7px 10px">
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px">Categoría</div>
+            <select id="gdCat" style="width:100%;padding:7px 10px;border:1.5px solid var(--amber2);border-radius:5px;font-size:13px;outline:none;background:var(--white);cursor:pointer">
+              <option>Comida</option><option>Gasolina</option><option>Compras</option>
+              <option>Salud</option><option>Entretenimiento</option><option>Transporte</option>
+              <option>Servicios</option><option>Otros</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:4px">Fecha</div>
+            <input class="inp" type="date" id="gdFecha" style="font-size:13px;padding:7px 10px;text-align:left;font-family:'DM Sans',sans-serif">
+          </div>
+          <div style="grid-column:1/-1">
+            <button onclick="agregarGastoDiario()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer">+ Agregar Gasto</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch r"><h3>📋 Historial de Gastos</h3>
+          <button onclick="limpiarGastosDiarios()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:3px 10px;border-radius:5px;cursor:pointer;font-size:11px">Limpiar Todo</button>
+        </div>
+        <div class="sx" id="gdLista"></div>
+      </div>
+    </div>
+
+    <!-- CALENDARIO DE PAGOS -->
+    <div class="sec" id="sec-calendario">
+      <div class="kgrid">
+        <div class="kpi r"><div class="kl">Pagos Este Mes</div><div class="kv" id="calKT">—</div></div>
+        <div class="kpi a"><div class="kl">Próximo Pago</div><div class="kv" id="calKP" style="font-size:14px">—</div></div>
+        <div class="kpi g"><div class="kl">Pagados</div><div class="kv" id="calKPag">—</div></div>
+        <div class="kpi"><div class="kl">Pendientes</div><div class="kv" id="calKPend">—</div></div>
+      </div>
+      <div class="card">
+        <div class="ch">
+          <h3>📅 Calendario de Pagos</h3>
+          <button onclick="nuevoPagoCalendario()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:3px 11px;border-radius:5px;cursor:pointer;font-size:11px;font-weight:700">+ Agregar</button>
+        </div>
+        <div id="calLista"></div>
+      </div>
+    </div>
+
+    <!-- INVERSIONES -->
+    <div class="sec" id="sec-inversiones">
+      <div class="kgrid">
+        <div class="kpi"><div class="kl">Total Invertido</div><div class="kv" id="invKI">$0</div></div>
+        <div class="kpi g"><div class="kl">Valor Actual</div><div class="kv" id="invKV">$0</div></div>
+        <div class="kpi g"><div class="kl">Ganancia Total</div><div class="kv" id="invKG">$0</div></div>
+        <div class="kpi"><div class="kl">% Rendimiento</div><div class="kv" id="invKR">0%</div></div>
+      </div>
+      <div class="card">
+        <div class="ch g">
+          <h3>📈 Portafolio de Inversiones</h3>
+          <button onclick="nuevaInversion()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:3px 11px;border-radius:5px;cursor:pointer;font-size:11px;font-weight:700">+ Agregar</button>
+        </div>
+        <div id="invLista"></div>
       </div>
     </div>
 
@@ -712,6 +835,10 @@ var D = {
     {n:'UCSF',               monto:50000,  ben:'Destiney, Amanda Soza, Giovanni'}
   ],
   // NUEVOS DATOS
+  gastosDiarios: [],
+  pagosCalendario: [],
+  inversiones: [],
+  darkMode: false,
   inquilinos_estado: [
     {nombre:'Mario Zapata',     prop:'2011 Market Ave 314, San Pablo', monto:2100, estado:[0,0,0,0,0,0,0,0,0,0,0,0], fechaCorte:1},
     {nombre:'Omar Olivares',    prop:'1838 1st St - Studio',           monto:1100, estado:[0,0,0,0,0,0,0,0,0,0,0,0], fechaCorte:1},
@@ -939,12 +1066,13 @@ function putEl(id, html) { var e = document.getElementById(id); if (e) e.innerHT
 // ════════════════════════════════════════
 // RENDER ALL
 // ════════════════════════════════════════
-function renderAll() { rPortada(); rDash(); rTarjetas(); rIngresos(); rGastos(); rDep(); rHip(); rPrest(); rSeg(); rGraf(); rRec(); }
+function renderAll() { rPortada(); rDash(); rTarjetas(); rIngresos(); rGastos(); rDep(); rHip(); rPrest(); rSeg(); rGraf(); rRec(); rGastosDiarios(); rCalendario(); rInversiones(); }
 function rSec(id) {
   var fns = {
     portada:rPortada, dashboard:rDash, tarjetas:rTarjetas, ingresos:rIngresos,
     gastos:rGastos, depositos:rDep, hipotecas:rHip, prestamos:rPrest,
-    seguros:rSeg, graficos:rGraf, recomendaciones:rRec
+    seguros:rSeg, graficos:rGraf, recomendaciones:rRec,
+    gastosDiarios:rGastosDiarios, calendario:rCalendario, inversiones:rInversiones
   };
   if (fns[id]) fns[id]();
 }
@@ -2429,6 +2557,9 @@ rSec = function(id) {
 };
 // Actualizar TITULOS
 TITULOS.inquilinos = 'Estado de Inquilinos';
+TITULOS.gastosDiarios = 'Gastos Diarios';
+TITULOS.calendario = 'Calendario de Pagos';
+TITULOS.inversiones = 'Inversiones';
 TITULOS.metas = 'Metas de Ahorro';
 TITULOS.calculadora = 'Calculadora de Deuda';
 TITULOS.historial = 'Historial Credit Score';
@@ -2437,6 +2568,305 @@ TITULOS.proyeccion = 'Proyección Año';
 TITULOS.alertas = 'Alertas Financieras';
 TITULOS.reporte = 'Reporte Mensual';
 
+
+// ════════════════════════════════════════
+// MODO OSCURO
+// ════════════════════════════════════════
+function toggleDark() {
+  D.darkMode = !D.darkMode;
+  aplicarDark();
+  autoguardar();
+}
+function aplicarDark() {
+  var body = document.body;
+  var btn  = document.getElementById('darkTxt');
+  if (D.darkMode) {
+    body.classList.add('dark');
+    if (btn) btn.textContent = 'Modo Claro';
+  } else {
+    body.classList.remove('dark');
+    if (btn) btn.textContent = 'Modo Oscuro';
+  }
+}
+
+// ════════════════════════════════════════
+// GASTOS DIARIOS
+// ════════════════════════════════════════
+function agregarGastoDiario() {
+  var desc  = document.getElementById('gdDesc');
+  var monto = document.getElementById('gdMonto');
+  var cat   = document.getElementById('gdCat');
+  var fecha = document.getElementById('gdFecha');
+  if (!desc.value || !monto.value) { toast('❌ Completa descripción y monto'); return; }
+  if (!D.gastosDiarios) D.gastosDiarios = [];
+  D.gastosDiarios.unshift({
+    id: Date.now(),
+    desc:  desc.value,
+    monto: parseFloat(monto.value) || 0,
+    cat:   cat.value,
+    fecha: fecha.value || new Date().toISOString().slice(0,10)
+  });
+  desc.value = ''; monto.value = '';
+  rGastosDiarios(); autoguardar(); toast('✅ Gasto registrado');
+}
+
+function elimGastoDiario(id) {
+  D.gastosDiarios = D.gastosDiarios.filter(function(g) { return g.id !== id; });
+  rGastosDiarios(); autoguardar();
+}
+
+function limpiarGastosDiarios() {
+  if (!confirm('¿Limpiar todo el historial de gastos diarios?')) return;
+  D.gastosDiarios = [];
+  rGastosDiarios(); autoguardar();
+}
+
+function rGastosDiarios() {
+  if (!D.gastosDiarios) D.gastosDiarios = [];
+  var hoy     = new Date().toISOString().slice(0,10);
+  var semana  = new Date(Date.now() - 7*24*60*60*1000).toISOString().slice(0,10);
+  var mes     = new Date().toISOString().slice(0,7);
+  var gasHoy  = D.gastosDiarios.filter(function(g){return g.fecha===hoy;}).reduce(function(s,g){return s+g.monto;},0);
+  var gasSem  = D.gastosDiarios.filter(function(g){return g.fecha>=semana;}).reduce(function(s,g){return s+g.monto;},0);
+  var gasMes2 = D.gastosDiarios.filter(function(g){return g.fecha.slice(0,7)===mes;}).reduce(function(s,g){return s+g.monto;},0);
+
+  var gdKH=document.getElementById('gdKH'); if(gdKH) gdKH.textContent=f$(gasHoy);
+  var gdKS=document.getElementById('gdKS'); if(gdKS) gdKS.textContent=f$(gasSem);
+  var gdKM=document.getElementById('gdKM'); if(gdKM) gdKM.textContent=f$(gasMes2);
+  var gdKC=document.getElementById('gdKC'); if(gdKC) gdKC.textContent=D.gastosDiarios.length;
+
+  // Fecha de hoy por defecto
+  var fdEl = document.getElementById('gdFecha');
+  if (fdEl && !fdEl.value) fdEl.value = hoy;
+
+  var el = document.getElementById('gdLista'); if (!el) return;
+  if (!D.gastosDiarios.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted)">Sin gastos registrados. Agrega tu primer gasto arriba.</div>';
+    return;
+  }
+
+  var cats = {
+    'Comida':'🍔','Gasolina':'⛽','Compras':'🛒','Salud':'💊',
+    'Entretenimiento':'🎬','Transporte':'🚌','Servicios':'💡','Otros':'📝'
+  };
+
+  var h = '<table class="tbl"><thead><tr><th>Fecha</th><th>Descripción</th><th class="c">Categoría</th><th class="r">Monto</th><th class="c">Elim.</th></tr></thead><tbody>';
+  var total = 0;
+  for (var i=0; i<D.gastosDiarios.length; i++) {
+    var g = D.gastosDiarios[i];
+    total += g.monto;
+    var ico = cats[g.cat] || '📝';
+    var esHoy = g.fecha === hoy;
+    h += '<tr style="' + (esHoy?'background:#FFF9E6':'') + '">' +
+      '<td style="font-size:11px;color:var(--muted)">' + g.fecha + (esHoy?' <span style="color:var(--orange);font-size:10px;font-weight:700">HOY</span>':'') + '</td>' +
+      '<td style="font-weight:600">' + g.desc + '</td>' +
+      '<td class="c">' + ico + ' ' + g.cat + '</td>' +
+      '<td class="r" style="font-family:DM Mono,monospace;font-weight:700;color:var(--red)">' + f$(g.monto) + '</td>' +
+      '<td class="c"><button onclick="elimGastoDiario(' + g.id + ')" style="background:#FEE2E2;border:none;color:var(--red);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px">✕</button></td>' +
+    '</tr>';
+  }
+  h += '<tr class="tot"><td colspan="3">TOTAL</td><td class="r">' + f$(total) + '</td><td></td></tr></tbody></table>';
+  el.innerHTML = h;
+}
+
+// ════════════════════════════════════════
+// CALENDARIO DE PAGOS
+// ════════════════════════════════════════
+function nuevoPagoCalendario() {
+  if (!D.pagosCalendario) D.pagosCalendario = [];
+  D.pagosCalendario.push({
+    id: Date.now(), nombre:'Nuevo Pago', monto:0,
+    dia:1, categoria:'Tarjeta', pagado:false, color:'#C0392B'
+  });
+  rCalendario(); autoguardar();
+}
+function elimPagoCalendario(id) {
+  D.pagosCalendario = D.pagosCalendario.filter(function(p){return p.id!==id;});
+  rCalendario(); autoguardar();
+}
+function togglePagado(id) {
+  D.pagosCalendario.forEach(function(p){if(p.id===id)p.pagado=!p.pagado;});
+  rCalendario(); autoguardar();
+}
+
+function rCalendario() {
+  if (!D.pagosCalendario) D.pagosCalendario = [];
+  var hoyDia = new Date().getDate();
+  var pagados = D.pagosCalendario.filter(function(p){return p.pagado;}).length;
+  var pendientes = D.pagosCalendario.filter(function(p){return !p.pagado;}).length;
+  var total = D.pagosCalendario.reduce(function(s,p){return s+p.monto;},0);
+
+  // Próximo pago pendiente
+  var proximos = D.pagosCalendario.filter(function(p){return !p.pagado && p.dia>=hoyDia;})
+    .sort(function(a,b){return a.dia-b.dia;});
+  var proximo = proximos.length > 0 ? proximos[0].nombre + ' día ' + proximos[0].dia : 'Sin pendientes';
+
+  var calKT=document.getElementById('calKT'); if(calKT) calKT.textContent=f$(total);
+  var calKP=document.getElementById('calKP'); if(calKP) calKP.textContent=proximo;
+  var calKPag=document.getElementById('calKPag'); if(calKPag) calKPag.textContent=pagados;
+  var calKPend=document.getElementById('calKPend'); if(calKPend) calKPend.textContent=pendientes;
+
+  var el = document.getElementById('calLista'); if (!el) return;
+  if (!D.pagosCalendario.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted)">Sin pagos. Presiona <strong>+ Agregar</strong>.</div>';
+    return;
+  }
+
+  // Ordenar por día
+  var sorted = D.pagosCalendario.slice().sort(function(a,b){return a.dia-b.dia;});
+  var h = '';
+  for (var i=0; i<sorted.length; i++) {
+    var p = sorted[i];
+    var vencido = !p.pagado && p.dia < hoyDia;
+    var bgRow = p.pagado?'#F0FFF4':vencido?'#FFF5F5':'';
+    h += '<div style="display:grid;grid-template-columns:50px 1fr auto auto auto;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);background:' + bgRow + '">' +
+      '<div style="text-align:center;background:' + (p.color||'#C0392B') + ';color:#fff;border-radius:8px;padding:6px 4px">' +
+        '<div style="font-size:18px;font-weight:700;line-height:1">' + p.dia + '</div>' +
+        '<div style="font-size:9px;opacity:.8">día</div>' +
+      '</div>' +
+      '<div>' +
+        '<input class="inp tx" type="text" value="' + p.nombre + '" style="font-size:13px;padding:3px 7px;width:100%;margin-bottom:3px" data-id="' + p.id + '" data-f="nombre" onchange="chgCalPago(this)">' +
+        '<div style="display:flex;gap:6px;align-items:center">' +
+          '<select style="font-size:10px;padding:2px 5px;border:1px solid var(--border);border-radius:4px;background:var(--white)" data-id="' + p.id + '" data-f="categoria" onchange="chgCalPago(this)">' +
+            ['Tarjeta','Hipoteca','Préstamo','Servicios','Seguro','Renta','Otro'].map(function(c){return '<option'+(p.categoria===c?' selected':'')+'>'+c+'</option>';}).join('') +
+          '</select>' +
+          '<span style="font-size:10px;color:var(--muted)">Día:</span>' +
+          '<input type="number" value="' + p.dia + '" min="1" max="31" style="width:40px;padding:2px 4px;border:1px solid var(--border);border-radius:4px;font-size:11px;text-align:center;background:var(--white)" data-id="' + p.id + '" data-f="dia" onchange="chgCalPago(this)">' +
+        '</div>' +
+      '</div>' +
+      '<input class="inp" type="number" value="' + (p.monto||'') + '" placeholder="$0" style="width:80px;padding:4px 6px;font-size:12px" data-id="' + p.id + '" data-f="monto" onchange="chgCalPago(this)">' +
+      '<button onclick="togglePagado(' + p.id + ')" style="background:' + (p.pagado?'#D1FAE5':'#FEF9C3') + ';border:none;border-radius:6px;padding:5px 8px;cursor:pointer;font-size:12px;font-weight:700;color:' + (p.pagado?'#065F46':'#92400E') + '">' + (p.pagado?'✅ Pagado':'⏳ Pagar') + '</button>' +
+      '<button onclick="elimPagoCalendario(' + p.id + ')" style="background:#FEE2E2;border:none;color:var(--red);padding:5px 8px;border-radius:5px;cursor:pointer;font-size:11px">✕</button>' +
+    '</div>';
+  }
+  el.innerHTML = h;
+}
+
+function chgCalPago(el) {
+  var id = parseInt(el.getAttribute('data-id'));
+  var f  = el.getAttribute('data-f');
+  D.pagosCalendario.forEach(function(p) {
+    if (p.id === id) p[f] = f==='monto'||f==='dia' ? parseFloat(el.value)||0 : el.value;
+  });
+  rCalendario(); autoguardar();
+}
+
+// ════════════════════════════════════════
+// INVERSIONES
+// ════════════════════════════════════════
+function nuevaInversion() {
+  if (!D.inversiones) D.inversiones = [];
+  D.inversiones.push({
+    id: Date.now(), nombre:'Nueva Inversión',
+    plataforma:'', monto:0, valorActual:0,
+    fecha: new Date().toISOString().slice(0,10),
+    tipo:'Acciones'
+  });
+  rInversiones(); autoguardar();
+}
+function elimInversion(id) {
+  D.inversiones = D.inversiones.filter(function(i){return i.id!==id;});
+  rInversiones(); autoguardar();
+}
+
+function rInversiones() {
+  if (!D.inversiones) D.inversiones = [];
+  var totalInv = D.inversiones.reduce(function(s,i){return s+i.monto;},0);
+  var totalVal = D.inversiones.reduce(function(s,i){return s+(i.valorActual||i.monto);},0);
+  var ganancia = totalVal - totalInv;
+  var rend     = totalInv>0 ? ((ganancia/totalInv)*100).toFixed(1) : 0;
+
+  var invKI=document.getElementById('invKI'); if(invKI) invKI.textContent=f$(totalInv);
+  var invKV=document.getElementById('invKV'); if(invKV) invKV.textContent=f$(totalVal);
+  var invKG=document.getElementById('invKG'); if(invKG) { invKG.textContent=f$(ganancia); invKG.style.color=ganancia>=0?'var(--green)':'var(--red)'; }
+  var invKR=document.getElementById('invKR'); if(invKR) { invKR.textContent=(rend>=0?'+':'')+rend+'%'; invKR.style.color=rend>=0?'var(--green)':'var(--red)'; }
+
+  var el = document.getElementById('invLista'); if (!el) return;
+  if (!D.inversiones.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted)">Sin inversiones. Presiona <strong>+ Agregar</strong>.</div>';
+    return;
+  }
+
+  var tipos = ['Acciones','ETF','Crypto','Bienes Raíces','Bonos','401k/IRA','Otro'];
+  var h = '';
+  for (var i=0; i<D.inversiones.length; i++) {
+    var inv = D.inversiones[i];
+    var gan  = (inv.valorActual||inv.monto) - inv.monto;
+    var rendI = inv.monto>0 ? ((gan/inv.monto)*100).toFixed(1) : 0;
+    var tiposOpts = tipos.map(function(t){return '<option'+(inv.tipo===t?' selected':'')+'>'+t+'</option>';}).join('');
+
+    h += '<div style="border-bottom:1px solid var(--border);padding:14px">' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">' +
+        '<div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:2px">Nombre</div>' +
+          '<input class="inp tx" type="text" value="' + inv.nombre + '" style="font-size:13px;padding:4px 8px" data-id="' + inv.id + '" data-f="nombre" onchange="chgInv(this)"></div>' +
+        '<div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:2px">Plataforma</div>' +
+          '<input class="inp tx" type="text" value="' + (inv.plataforma||'') + '" placeholder="Robinhood, Fidelity..." style="font-size:13px;padding:4px 8px" data-id="' + inv.id + '" data-f="plataforma" onchange="chgInv(this)"></div>' +
+        '<div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:2px">Tipo</div>' +
+          '<select style="width:100%;padding:5px 8px;border:1.5px solid var(--amber2);border-radius:5px;font-size:12px;outline:none;background:var(--white)" data-id="' + inv.id + '" data-f="tipo" onchange="chgInv(this)">' + tiposOpts + '</select></div>' +
+        '<div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:2px">Fecha Inicio</div>' +
+          '<input class="inp" type="date" value="' + (inv.fecha||'') + '" style="font-size:12px;padding:4px 8px;text-align:left;font-family:DM Sans,sans-serif" data-id="' + inv.id + '" data-f="fecha" onchange="chgInv(this)"></div>' +
+        '<div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:2px">Monto Invertido ($)</div>' +
+          '<input class="inp" type="number" value="' + (inv.monto||'') + '" placeholder="0" style="font-size:15px;padding:5px 8px" data-id="' + inv.id + '" data-f="monto" onchange="chgInv(this)"></div>' +
+        '<div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:2px">Valor Actual ($)</div>' +
+          '<input class="inp" type="number" value="' + (inv.valorActual||'') + '" placeholder="0" style="font-size:15px;padding:5px 8px" data-id="' + inv.id + '" data-f="valorActual" onchange="chgInv(this)"></div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;background:' + (gan>=0?'#F0FFF4':'#FFF5F5') + ';border-radius:8px;padding:10px 14px">' +
+        '<div>' +
+          '<div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase">Ganancia / Pérdida</div>' +
+          '<div style="font-size:22px;font-family:DM Mono,monospace;font-weight:700;color:' + (gan>=0?'var(--green)':'var(--red)') + '">' + (gan>=0?'+':'') + f$(gan) + ' (' + (rendI>=0?'+':'') + rendI + '%)</div>' +
+        '</div>' +
+        '<button onclick="elimInversion(' + inv.id + ')" style="background:#FEE2E2;border:none;color:var(--red);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700">✕ Eliminar</button>' +
+      '</div>' +
+    '</div>';
+  }
+  // Total
+  h += '<div style="padding:14px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;display:flex;justify-content:space-between;align-items:center">' +
+    '<div><div style="font-size:10px;opacity:.7;text-transform:uppercase">PORTAFOLIO TOTAL</div>' +
+      '<div style="font-size:11px;opacity:.7">Invertido: ' + f$(totalInv) + ' | Valor: ' + f$(totalVal) + '</div></div>' +
+    '<div style="text-align:right"><div style="font-size:24px;font-family:DM Mono,monospace;font-weight:700;color:' + (ganancia>=0?'#A9D18E':'#FFAAAA') + '">' + (ganancia>=0?'+':'') + f$(ganancia) + '</div>' +
+      '<div style="font-size:12px;opacity:.7">' + (rend>=0?'+':'') + rend + '% rendimiento</div></div>' +
+  '</div>';
+  el.innerHTML = h;
+}
+
+function chgInv(el) {
+  var id = parseInt(el.getAttribute('data-id'));
+  var f  = el.getAttribute('data-f');
+  D.inversiones.forEach(function(inv) {
+    if (inv.id === id) {
+      if (f==='monto'||f==='valorActual') inv[f]=parseFloat(el.value)||0;
+      else inv[f]=el.value;
+    }
+  });
+  rInversiones(); autoguardar();
+}
+
+// ════════════════════════════════════════
+// RELOJ EN TIEMPO REAL
+var DIAS   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+var MESES2 = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function actualizarReloj() {
+  var now  = new Date();
+  var h    = now.getHours();
+  var m    = now.getMinutes();
+  var s    = now.getSeconds();
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  var h12  = h % 12 || 12;
+  var mm   = m < 10 ? '0' + m : m;
+  var ss   = s < 10 ? '0' + s : s;
+  var horaStr  = h12 + ':' + mm + ':' + ss + ' ' + ampm;
+  var fechaStr = DIAS[now.getDay()] + ', ' + now.getDate() + ' de ' + MESES2[now.getMonth()] + ' ' + now.getFullYear();
+
+  var rt = document.getElementById('relojTopbar');
+  var rh = document.getElementById('relojHora');
+  var rf = document.getElementById('relojFecha');
+  if (rt) rt.textContent = h12 + ':' + mm + ' ' + ampm;
+  if (rh) rh.textContent = horaStr;
+  if (rf) rf.textContent = fechaStr;
+}
+actualizarReloj();
+setInterval(actualizarReloj, 1000);
 
 // ── MENU MÓVIL ─────────────────────────────────────
 function toggleMenu() {
@@ -2516,6 +2946,10 @@ ir = function(id) {
     if (!s.ben && s.beneficiarios) { s.ben = s.beneficiarios; delete s.beneficiarios; }
   });
 
+  if (!D.gastosDiarios)    D.gastosDiarios = [];
+  if (!D.pagosCalendario)  D.pagosCalendario = [];
+  if (!D.inversiones)      D.inversiones = [];
+  if (D.darkMode) aplicarDark();
   updScore(D.score || 719);
   renderAll();
   if (window.SC) {
