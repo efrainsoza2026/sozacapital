@@ -345,8 +345,6 @@ body.dark .bb { opacity:.9; }
       <button class="menu-btn" id="menuBtn" onclick="toggleMenu()">☰</button>
       <div class="tb-title" id="tbtitle">Portada</div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div id="relojTopbar" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--navy);background:var(--silver);padding:4px 10px;border-radius:20px;letter-spacing:.03em"></div>
     <div class="tb-right">
       <span class="badge" id="mesLbl">Enero</span>
       <button class="btn" onclick="window.print()">🖨 Sección</button>
@@ -2858,10 +2856,8 @@ function actualizarReloj() {
   var horaStr  = h12 + ':' + mm + ':' + ss + ' ' + ampm;
   var fechaStr = DIAS[now.getDay()] + ', ' + now.getDate() + ' de ' + MESES2[now.getMonth()] + ' ' + now.getFullYear();
 
-  var rt = document.getElementById('relojTopbar');
   var rh = document.getElementById('relojHora');
   var rf = document.getElementById('relojFecha');
-  if (rt) rt.textContent = h12 + ':' + mm + ' ' + ampm;
   if (rh) rh.textContent = horaStr;
   if (rf) rf.textContent = fechaStr;
 }
