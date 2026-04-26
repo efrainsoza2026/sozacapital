@@ -218,7 +218,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#1A1A2E;min-hei
 }
 @media (max-width: 480px) {
   .kgrid { grid-template-columns: repeat(2, 1fr); }
-  .tb-right .btn:not(:first-child):not(:nth-child(2)) { display: none; }
+  .tb-right .btn.hide-mobile { display: none; }
 }
 .menu-btn { display: none; }
 
@@ -307,8 +307,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#1A1A2E;min-hei
     </div>
     <div class="tb-right">
       <span class="badge" id="mesLbl">Enero</span>
-      <button class="btn" onclick="window.print()">🖨 Imprimir Sección</button>
-      <button class="btn" style="background:#7D3C98" onclick="imprimirTodo()">🖨 Imprimir Todo</button>
+      <button class="btn" onclick="window.print()">🖨 Sección</button>
+      <button class="btn" style="background:#7D3C98" onclick="imprimirTodo()">🖨 Todo</button>
       <button class="btn g" onclick="guardar()">💾 Guardar</button>
       <button class="btn b" onclick="exportar()">📥 Backup</button>
       <label class="btn gr" style="cursor:pointer">📂<input type="file" accept=".json" style="display:none" onchange="importar(this)"></label>
