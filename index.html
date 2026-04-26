@@ -282,7 +282,7 @@ body.dark .bb { opacity:.9; }
 <div class="sb-overlay" id="sbOverlay" onclick="toggleMenu()"></div>
 <aside class="sb" id="sidebar">
   <div class="sb-head">
-    <div class="sb-logo">Soza Capital<span>Efraín Soza · Richmond CA</span></div>
+    <div class="sb-logo">Soza Capital<span>Efraín Enrique Centeno Soza · Richmond CA</span></div>
     <div class="score-box">
       <label>Credit Score — edita aquí</label>
       <input class="score-inp" id="scInp" type="number" value="719" onchange="updScore(this.value)">
@@ -361,7 +361,7 @@ body.dark .bb { opacity:.9; }
     <div class="sec on" id="sec-portada">
       <div class="hero">
         <h1>Soza Capital</h1>
-        <p>Efraín Soza · Richmond, California · 2025–2026</p>
+        <p>Efraín Enrique Centeno Soza · Richmond, California · 2025–2026</p>
         <div id="relojPortada" style="margin-top:14px;display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:10px 18px">
           <div id="relojHora" style="font-family:'DM Mono',monospace;font-size:32px;font-weight:500;color:var(--amber);line-height:1"></div>
           <div id="relojFecha" style="font-size:12px;color:rgba(255,255,255,.7);margin-top:3px"></div>
@@ -2505,7 +2505,7 @@ function rReporte() {
 
   var h = '<div style="text-align:center;border-bottom:3px solid var(--navy);padding-bottom:16px;margin-bottom:20px">' +
     '<h1 style="font-family:Playfair Display,serif;font-size:26px;color:var(--navy);margin-bottom:4px">Sistema Financiero Personal</h1>' +
-    '<h2 style="font-size:18px;color:var(--blue);font-weight:400;margin-bottom:4px">Efraín Soza — Richmond, California</h2>' +
+    '<h2 style="font-size:18px;color:var(--blue);font-weight:400;margin-bottom:4px">Efraín Enrique Centeno Soza — Richmond, California</h2>' +
     '<h3 style="font-size:15px;color:var(--muted);font-weight:400">Reporte Mensual: <strong>' + MESES[mi] + ' ' + new Date().getFullYear() + '</strong></h3>' +
     '<div style="font-size:11px;color:var(--muted);margin-top:4px">Generado: ' + fechaHoy + '</div>' +
   '</div>';
@@ -2562,7 +2562,7 @@ function rReporte() {
 
   // Footer
   h += '<div style="text-align:center;border-top:2px solid var(--border);padding-top:12px;margin-top:20px;font-size:10px;color:var(--muted)">' +
-    'Sistema Financiero Personal — Efraín Soza · Richmond, California · Credit Score: ' + D.score + ' · Generado el ' + fechaHoy +
+    'Sistema Financiero Personal — Efraín Enrique Centeno Soza · Richmond, California · Credit Score: ' + D.score + ' · Generado el ' + fechaHoy +
   '</div>';
 
   el.innerHTML = h;
@@ -2745,6 +2745,10 @@ function rDineroPrestado() {
             '<input class="inp" type="number" value="' + (d.plazoMeses||1) + '" min="1" style="font-size:15px;padding:4px 8px;width:100%" data-id="' + d.id + '" data-f="plazoMeses" onchange="chgDP(this)"></div>' +
           '<div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:2px">Mes de Inicio</div>' +
             '<select style="width:100%;padding:5px 8px;border:1.5px solid var(--amber2);border-radius:5px;font-size:12px;outline:none;background:var(--white);color:#92400E;cursor:pointer" data-id="' + d.id + '" data-f="mesInicio" onchange="chgDP(this)">' + mesesOpts + '</select></div>' +
+          '<div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:2px">Dirección del Deudor</div>' +
+            '<input class="inp tx" type="text" value="' + (d.direccionDeudor||'') + '" placeholder="Calle, Ciudad, Estado" style="font-size:12px;padding:4px 8px;width:100%" data-id="' + d.id + '" data-f="direccionDeudor" onchange="chgDP(this)"></div>' +
+          '<div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:2px">Teléfono del Deudor</div>' +
+            '<input class="inp tx" type="text" value="' + (d.telDeudor||'') + '" placeholder="415-000-0000" style="font-size:12px;padding:4px 8px;width:100%" data-id="' + d.id + '" data-f="telDeudor" onchange="chgDP(this)"></div>' +
           '<div><div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:2px">Estado</div>' +
             '<div style="display:flex;gap:5px;margin-top:4px">' +
               '<button onclick="setEstadoDP(' + d.id + ',\'pendiente\')" style="flex:1;background:' + (d.estado==='pendiente'?'#FEF9C3':'#F1F5F9') + ';border:1px solid #FDE68A;border-radius:5px;padding:4px;cursor:pointer;font-size:10px;font-weight:700;color:#92400E">⏳</button>' +
@@ -2854,13 +2858,13 @@ function generarContrato(id) {
     '<div class="info-grid">' +
       '<div class="info-box">' +
         '<label>PRESTAMISTA (quien presta)</label>' +
-        '<span>Efraín Soza</span><br>' +
-        '<small style="color:#6B7280">Richmond, California<br>efrainsoza2026@github.io</small>' +
+        '<span>Efraín Enrique Centeno Soza</span><br>' +
+        '<small style="color:#6B7280">Richmond, California 94805<br>Tel: 415-374-4995<br>efrainsoza@gmail.com</small>' +
       '</div>' +
       '<div class="info-box">' +
         '<label>DEUDOR (quien recibe)</label>' +
         '<span>' + d.nombre + '</span><br>' +
-        '<small style="color:#6B7280">Dirección: ________________________<br>Tel: ________________________</small>' +
+        '<small style="color:#6B7280">Dirección: ' + (d.direccionDeudor || '________________________') + '<br>Tel: ' + (d.telDeudor || '________________________') + '</small>' +
       '</div>' +
     '</div>' +
 
@@ -2893,13 +2897,13 @@ function generarContrato(id) {
 
     '<h3>ACUERDO Y OBLIGACIONES</h3>' +
     '<div class="clausula">' +
-      '<p style="margin:0;font-size:12px">Yo, <strong>' + d.nombre + '</strong>, en pleno uso de mis facultades, acepto haber recibido la cantidad de <strong>$' + d.monto.toLocaleString() + ' dólares</strong> en calidad de préstamo personal de parte de <strong>Efraín Soza</strong>, y me comprometo a devolver la cantidad total de <strong>$' + totalRecibir.toFixed(2) + ' dólares</strong> en un plazo de <strong>' + n + ' mes' + (n>1?'es':'') + '</strong>, mediante pagos mensuales de <strong>$' + cuotaMes.toFixed(2) + '</strong>, comenzando en <strong>' + MESES_ESP[mesInicio] + ' ' + hoy.getFullYear() + '</strong>.</p>' +
+      '<p style="margin:0;font-size:12px">Yo, <strong>' + d.nombre + '</strong>, en pleno uso de mis facultades, acepto haber recibido la cantidad de <strong>$' + d.monto.toLocaleString() + ' dólares</strong> en calidad de préstamo personal de parte de <strong>Efraín Enrique Centeno Soza</strong>, y me comprometo a devolver la cantidad total de <strong>$' + totalRecibir.toFixed(2) + ' dólares</strong> en un plazo de <strong>' + n + ' mes' + (n>1?'es':'') + '</strong>, mediante pagos mensuales de <strong>$' + cuotaMes.toFixed(2) + '</strong>, comenzando en <strong>' + MESES_ESP[mesInicio] + ' ' + hoy.getFullYear() + '</strong>.</p>' +
       '<p style="margin:8px 0 0 0;font-size:12px">El incumplimiento de cualquier pago generará intereses moratorios y podrá resultar en acción legal inmediata.</p>' +
     '</div>' +
 
     '<div class="small-claims">' +
       '<h4>⚖️ CLÁUSULA DE SMALL CLAIMS COURT (Corte de Reclamos Menores)</h4>' +
-      '<p style="font-size:11px;margin:0">En caso de incumplimiento total o parcial de este contrato, el prestamista <strong>Efraín Soza</strong> se reserva el derecho de presentar una demanda ante el <strong>Small Claims Court del Condado de Contra Costa, California</strong>, de conformidad con el Código de Procedimiento Civil de California §116.110 et seq.</p>' +
+      '<p style="font-size:11px;margin:0">En caso de incumplimiento total o parcial de este contrato, el prestamista <strong>Efraín Enrique Centeno Soza</strong> se reserva el derecho de presentar una demanda ante el <strong>Small Claims Court del Condado de Contra Costa, California</strong>, de conformidad con el Código de Procedimiento Civil de California §116.110 et seq.</p>' +
       '<p style="font-size:11px;margin:8px 0 0 0"><strong>Corte:</strong> Contra Costa County Superior Court — Richmond Courthouse<br>' +
       '<strong>Dirección:</strong> 100 37th Street, Richmond, CA 94805<br>' +
       '<strong>Límite Small Claims:</strong> Hasta $12,500 sin necesidad de abogado<br>' +
@@ -2913,7 +2917,7 @@ function generarContrato(id) {
         '<div class="firma-linea"><strong>DEUDOR</strong><br>' + d.nombre + '<br>Fecha: _______________</div>' +
       '</div>' +
       '<div class="firma-box">' +
-        '<div class="firma-linea"><strong>PRESTAMISTA</strong><br>Efraín Soza<br>Fecha: _______________</div>' +
+        '<div class="firma-linea"><strong>PRESTAMISTA</strong><br>Efraín Enrique Centeno Soza<br>Tel: 415-374-4995<br>efrainsoza@gmail.com<br>Fecha: _______________</div>' +
       '</div>' +
     '</div>' +
 
@@ -2927,7 +2931,8 @@ function generarContrato(id) {
 
     '<div class="footer">' +
       'Contrato generado por Soza Capital — ' + fechaStr + '<br>' +
-      'Número de contrato: SC-' + id.toString().slice(-6) + ' — Richmond, California — efrainsoza2026.github.io/sozacapital' +
+      'Efraín Enrique Centeno Soza — Richmond, CA 94805 — Tel: 415-374-4995 — efrainsoza@gmail.com<br>' +
+      'Número de contrato: SC-' + id.toString().slice(-6) +
     '</div>' +
     '</body></html>';
 
