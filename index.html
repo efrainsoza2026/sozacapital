@@ -1323,6 +1323,18 @@ function chgTarjPago(el) {
   var ti = parseInt(el.getAttribute('data-ti'));
   var mi = parseInt(el.getAttribute('data-mi'));
   D.tarjetas[ti].p[mi] = parseFloat(el.value) || 0;
+  var v = parseFloat(el.value);
+  if (!isNaN(v) && v > 0) {
+    el.style.background = '#EBF5FB';
+    el.style.borderColor = '#1F4E78';
+    el.style.color = '#1F4E78';
+    el.style.fontWeight = '700';
+  } else {
+    el.style.background = '';
+    el.style.borderColor = '';
+    el.style.color = '';
+    el.style.fontWeight = '';
+  }
   rTarjetas(); rDash(); rPortada(); autoguardar();
 }
 function chgTarjDeuda(el) {
