@@ -200,6 +200,16 @@ body.dark select { background:#1A2535; color:#E2E8F0; border-color:#2A3A4A; }
 body.dark .ac { background:linear-gradient(135deg,#0F1923,#1A2535); }
 body.dark .bb { opacity:.9; }
 
+
+/* ── INPUTS CON VALOR EN AZUL ─────────────────────── */
+input.inp:not([type="text"]):not([type="date"]).has-val,
+input.inp[type="number"].has-val {
+  background: #EBF5FB !important;
+  border-color: #1F4E78 !important;
+  color: #1F4E78 !important;
+  font-weight: 700 !important;
+}
+
 /* ── MÓVIL RESPONSIVO ─────────────────────────────── */
 @media (max-width: 768px) {
   .sb {
@@ -423,6 +433,7 @@ body.dark .bb { opacity:.9; }
       </div>
       <div class="card"><div class="ch g"><h3>💼 Trabajo y Beneficios</h3></div><div class="sx" id="iTrabTabla"></div></div>
       <div class="card"><div class="ch"><h3>🏠 Rentas</h3></div><div class="sx" id="iRentTabla"></div></div>
+      <div id="iTotalGeneral" style="margin-bottom:14px;border-radius:8px;overflow:hidden"></div>
     </div>
 
     <!-- GASTOS -->
@@ -1113,7 +1124,7 @@ function putEl(id, html) { var e = document.getElementById(id); if (e) e.innerHT
 // ════════════════════════════════════════
 // RENDER ALL
 // ════════════════════════════════════════
-function renderAll() { rPortada(); rDash(); rTarjetas(); rIngresos(); rGastos(); rDep(); rHip(); rPrest(); rSeg(); rGraf(); rRec(); rGastosDiarios(); rCalendario(); rInversiones(); rDineroPrestado(); rNotas(); }
+function renderAll() { setTimeout(colorearTodosInputs, 100); rPortada(); rDash(); rTarjetas(); rIngresos(); rGastos(); rDep(); rHip(); rPrest(); rSeg(); rGraf(); rRec(); rGastosDiarios(); rCalendario(); rInversiones(); rDineroPrestado(); rNotas(); }
 function rSec(id) {
   var fns = {
     portada:rPortada, dashboard:rDash, tarjetas:rTarjetas, ingresos:rIngresos,
@@ -1269,10 +1280,13 @@ function rTarjetas() {
 
     var mInputs = '';
     for (var m=0; m<12; m++) {
-      mInputs += '<td class="r"><input class="inp" type="number" value="' + (t.p[m]||'') + '" placeholder="0" style="width:68px;padding:3px 4px;font-size:11px" data-ti="' + ti + '" data-mi="' + m + '" onchange="chgTarjPago(this)"></td>';
+      var pago = t.p[m];
+      var tieneValor = pago !== undefined && pago !== null && pago !== '';
+      var bgPago = tieneValor ? 'background:#EBF5FB;border-color:#1F4E78;color:#1F4E78;font-weight:700' : '';
+      mInputs += '<td class="r"><input class="inp" type="number" value="' + (tieneValor ? pago : '') + '" placeholder="0" style="width:68px;padding:3px 4px;font-size:11px;' + bgPago + '" data-ti="' + ti + '" data-mi="' + m + '" onchange="chgTarjPago(this)"></td>';
     }
 
-    var deudaCell = '<td class="r"><input class="inp" type="number" value="' + (t.d||'') + '" style="width:86px;padding:3px 5px;font-size:11px" data-ti="' + ti + '" onchange="chgTarjDeuda(this)">';
+    var deudaCell = '<td class="r"><input class="inp" type="number" value="' + (t.d !== undefined && t.d !== null ? t.d : 0) + '" placeholder="0" style="width:86px;padding:3px 5px;font-size:11px" data-ti="' + ti + '" onchange="chgTarjDeuda(this)">';
     if (tpag > 0) {
       var restTxt = rest === 0 ? '✅ Pagada' : '→' + f$(rest);
       deudaCell += '<div style="font-size:9px;color:' + (rest>0?'var(--red)':'var(--green)') + ';font-weight:700;margin-top:1px">' + restTxt + '</div>';
@@ -1339,6 +1353,28 @@ function rIngresos() {
 
   putEl('iTrabTabla', mkIngTabla(D.ingT, 'ingT', false));
   putEl('iRentTabla', mkIngTabla(D.rentas, 'rentas', true));
+
+  // Total General = Trabajo + Rentas
+  var totGenEl = document.getElementById('iTotalGeneral');
+  if (totGenEl) {
+    var totTrabajo = D.ingT.reduce(function(s,i){return s+i.m.reduce(function(ps,v){return ps+v;},0);},0);
+    var totRentas  = D.rentas.reduce(function(s,i){return s+i.m.reduce(function(ps,v){return ps+v;},0);},0);
+    var totalGen   = totTrabajo + totRentas;
+    var mTotGen = '';
+    for (var mi=0; mi<12; mi++) {
+      var vT = D.ingT.reduce(function(s,i){return s+(i.m[mi]||0);},0);
+      var vR = D.rentas.reduce(function(s,i){return s+(i.m[mi]||0);},0);
+      mTotGen += '<td class="r" style="font-family:DM Mono,monospace;font-weight:700;font-size:11px;color:#FFE599">' + f$(vT+vR) + '</td>';
+    }
+    totGenEl.innerHTML =
+      '<table class="tbl" style="font-size:11px;margin-top:4px"><tbody>' +
+      '<tr style="background:linear-gradient(135deg,#0B2A4A,#1F4E78)">' +
+        '<td colspan="2" style="color:#FFE599;font-weight:700;font-size:12px;padding:10px 14px">💰 TOTAL GENERAL (Trabajo + Rentas)</td>' +
+        mTotGen +
+        '<td class="r" style="color:#FFE599;font-family:DM Mono,monospace;font-weight:700;font-size:13px">' + f$(totalGen) + '</td>' +
+        '<td class="r" style="color:#A9D18E;font-family:DM Mono,monospace;font-weight:700">' + f$(totalGen/12) + '</td>' +
+      '</tr></tbody></table>';
+  }
 }
 
 function mkIngTabla(items, key, isRenta) {
@@ -1350,7 +1386,7 @@ function mkIngTabla(items, key, isRenta) {
     var ta = it.m.reduce(function(s,v){return s+v;},0);
     var mI = '';
     for (var mi=0; mi<12; mi++) {
-      mI += '<td class="r"><input class="inp" type="number" value="' + (it.m[mi]||'') + '" placeholder="0" style="width:74px;padding:3px 4px;font-size:11px" data-key="' + key + '" data-ii="' + ii + '" data-mi="' + mi + '" onchange="chgIng(this)"></td>';
+      mI += '<td class="r"><input class="inp" type="number" value="' + (it.m[mi]||'') + '" placeholder="0" style="width:74px;padding:3px 4px;font-size:11px" data-key="' + key + '" data-ii="' + ii + '" data-mi="' + mi + '" onchange="chgIng(this);colorearInput(this)"></td>';
     }
     h += '<tr><td style="font-weight:600">' + it.n + '</td>' + (isRenta?'<td style="font-size:10px;color:var(--muted)">' + it.prop + '</td>':'') + mI + '<td class="r" style="font-family:DM Mono,monospace;font-weight:700">' + f$(ta) + '</td><td class="r" style="font-family:DM Mono,monospace">' + f$(ta/12) + '</td></tr>';
   }
@@ -1432,7 +1468,7 @@ function rDep() {
     var gm = gasMes(mi), bal = dep - gm;
     var hl = mi === MA ? 'style="background:#EBF5FB;font-weight:600"' : '';
     h += '<tr ' + hl + '><td>' + MESES[mi] + '</td>' +
-      '<td class="r"><input class="inp" type="number" value="' + (dep||'') + '" placeholder="0" style="width:108px" data-mi="' + mi + '" onchange="chgDep(this)"></td>' +
+      '<td class="r"><input class="inp" type="number" value="' + (dep||'') + '" placeholder="0" style="width:108px" data-mi="' + mi + '" onchange="chgDep(this);colorearInput(this)"></td>' +
       '<td class="r" style="font-family:DM Mono,monospace">' + f$(acum) + '</td>' +
       '<td class="r" style="font-family:DM Mono,monospace">' + f$(gm) + '</td>' +
       '<td class="r" style="font-family:DM Mono,monospace;font-weight:600;color:' + (bal>=0?'var(--green)':'var(--red)') + '">' + f$(bal) + '</td></tr>';
@@ -2850,6 +2886,19 @@ function elimDineroPrestado(id) {
   rDineroPrestado(); autoguardar();
 }
 
+function chgDPPago(el) {
+  var id = parseInt(el.getAttribute('data-id'));
+  var mi = parseInt(el.getAttribute('data-mi'));
+  D.dineroPrestado.forEach(function(d) {
+    if (d.id === id) {
+      if (!d.pagosRecibidos) d.pagosRecibidos = [];
+      while (d.pagosRecibidos.length <= mi) d.pagosRecibidos.push(0);
+      d.pagosRecibidos[mi] = parseFloat(el.value) || 0;
+    }
+  });
+  rDineroPrestado(); autoguardar();
+}
+
 function chgDP(el) {
   var id  = parseInt(el.getAttribute('data-id'));
   var f   = el.getAttribute('data-f');
@@ -2933,19 +2982,33 @@ function rDineroPrestado() {
     var mesesOpts = MESES.map(function(m,i){return '<option value="'+i+'"'+(i===(d.mesInicio||0)?' selected':'')+'>'+m+'</option>';}).join('');
     var tablaRows = '';
     var saldo = d.monto;
+    var totalPagado = 0;
+    if (!d.pagosRecibidos) d.pagosRecibidos = [];
     for (var mi=0; mi<n; mi++) {
       var mesReal = ((d.mesInicio||0) + mi) % 12;
       var mesNom  = MESES[mesReal] + (mi>=12?' (año '+(Math.floor(mi/12)+1)+')':'');
       var intM    = r>0 ? saldo*r : interesMes;
       var capital = r>0 ? (totalRecibir/n - intM) : d.monto/n;
       var cuota   = r>0 ? totalRecibir/n : (d.monto/n + interesMes);
-      tablaRows += '<tr style="' + (mesReal===MA?'background:#EBF5FB;font-weight:600':'') + '">' +
+      var pagado  = d.pagosRecibidos[mi] || 0;
+      totalPagado += pagado;
+      var diff = pagado - cuota;
+      var bgRow = pagado > 0 ? (diff >= 0 ? '#F0FFF4' : '#FFF9E6') : '';
+      tablaRows += '<tr style="background:' + bgRow + (mesReal===MA?';font-weight:600':'') + '">' +
         '<td>' + mesNom + '</td>' +
         '<td class="r" style="color:var(--green);font-family:DM Mono,monospace">' + f$(cuota) + '</td>' +
         '<td class="r" style="color:var(--red);font-family:DM Mono,monospace">' + f$(intM) + '</td>' +
         '<td class="r" style="color:var(--blue);font-family:DM Mono,monospace">' + f$(capital) + '</td>' +
+        '<td class="r"><input type="number" value="' + (pagado||'') + '" placeholder="0" ' +
+          'style="width:80px;padding:3px 6px;border:1.5px solid ' + (pagado>0?'#1E8449':'#CBD5E1') + ';' +
+          'border-radius:4px;font-size:11px;text-align:right;background:' + (pagado>0?'#F0FFF4':'var(--white)') + ';' +
+          'color:' + (pagado>0?'#1E8449':'#1A1A2E') + ';font-family:DM Mono,monospace;font-weight:' + (pagado>0?'700':'400') + '" ' +
+          'data-id="' + d.id + '" data-mi="' + mi + '" onchange="chgDPPago(this)"></td>' +
+        '<td class="r" style="font-size:10px;font-weight:700;color:' + (diff>0?'var(--green)':diff<0?'var(--red)':'var(--muted)') + '">' +
+          (pagado>0 ? (diff>0?'+':'')+f$(diff) : '—') + '</td>' +
       '</tr>';
     }
+    var saldoRestante = Math.max(0, totalRecibir - totalPagado);
 
     html += '<div style="margin:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden">' +
       '<div style="background:' + bgHead + ';padding:10px 14px;display:flex;justify-content:space-between;align-items:center">' +
@@ -2992,6 +3055,15 @@ function rDineroPrestado() {
           '<div style="background:#FFF9E6;border-radius:8px;padding:10px;border:2px solid #F4B942;text-align:center">' +
             '<div style="font-size:9px;color:var(--orange);font-weight:700;text-transform:uppercase">Tu Ganancia</div>' +
             '<div style="font-size:20px;font-family:DM Mono,monospace;font-weight:700;color:var(--orange)">+' + f$(ganancia) + '</div></div>' +
+          '<div style="background:#F0FFF4;border-radius:8px;padding:10px;border:2px solid #6FCF97;text-align:center">' +
+            '<div style="font-size:9px;color:var(--teal);font-weight:700;text-transform:uppercase">Total Recibido</div>' +
+            '<div style="font-size:20px;font-family:DM Mono,monospace;font-weight:700;color:var(--teal)">' + f$(totalPagado) + '</div></div>' +
+          '<div style="background:' + (saldoRestante>0?'#FFF5F5':'#F0FFF4') + ';border-radius:8px;padding:10px;border:2px solid ' + (saldoRestante>0?'#FECACA':'#A7F3D0') + ';text-align:center">' +
+            '<div style="font-size:9px;color:' + (saldoRestante>0?'var(--red)':'var(--green)') + ';font-weight:700;text-transform:uppercase">Saldo Pendiente</div>' +
+            '<div style="font-size:20px;font-family:DM Mono,monospace;font-weight:700;color:' + (saldoRestante>0?'var(--red)':'var(--green)') + '">' + f$(saldoRestante) + '</div></div>' +
+          '<div style="background:#F8F9FA;border-radius:8px;padding:10px;border:2px solid #CBD5E1;text-align:center">' +
+            '<div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase">% Cobrado</div>' +
+            '<div style="font-size:20px;font-family:DM Mono,monospace;font-weight:700;color:var(--navy)">' + (totalRecibir>0?Math.round(totalPagado/totalRecibir*100):0) + '%</div></div>' +
         '</div>' +
         '<div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:7px;text-transform:uppercase">📅 Calendario de Cobros</div>' +
         '<div style="margin-bottom:10px">' +
@@ -2999,9 +3071,9 @@ function rDineroPrestado() {
         '</div>' +
         '<div class="sx">' +
           '<table class="tbl" style="font-size:11px"><thead><tr>' +
-            '<th>Mes</th><th class="r">Cuota a Cobrar</th><th class="r">Interés</th><th class="r">Capital</th>' +
+            '<th>Mes</th><th class="r">Cuota</th><th class="r">Interés</th><th class="r">Capital</th><th class="r" style="color:#A7F3D0">Recibido</th><th class="r" style="color:#FEF9C3">Diferencia</th>' +
           '</tr></thead><tbody>' + tablaRows + '</tbody>' +
-          '<tfoot><tr class="tot"><td>TOTAL</td><td class="r">' + f$(totalRecibir) + '</td><td class="r">' + f$(ganancia) + '</td><td class="r">' + f$(d.monto) + '</td></tr></tfoot>' +
+          '<tfoot><tr class="tot"><td>TOTAL</td><td class="r">' + f$(totalRecibir) + '</td><td class="r">' + f$(ganancia) + '</td><td class="r">' + f$(d.monto) + '</td><td class="r">' + f$(totalPagado) + '</td><td class="r">' + f$(totalPagado-totalRecibir) + '</td></tr></tfoot>' +
           '</table></div>' +
       '</div></div>';
   });
@@ -3453,6 +3525,42 @@ function chgInv(el) {
   });
   rInversiones(); autoguardar();
 }
+
+// ════════════════════════════════════════
+// COLOREAR INPUTS CON VALOR EN AZUL
+// ════════════════════════════════════════
+function colorearInput(el) {
+  if (!el || el.type !== 'number') return;
+  if (el.value !== '' && !isNaN(parseFloat(el.value))) {
+    el.style.background = '#EBF5FB';
+    el.style.borderColor = '#1F4E78';
+    el.style.color = '#1F4E78';
+    el.style.fontWeight = '700';
+  } else {
+    el.style.background = '';
+    el.style.borderColor = '';
+    el.style.color = '';
+    el.style.fontWeight = '';
+  }
+}
+
+function colorearTodosInputs() {
+  document.querySelectorAll('input[type="number"].inp').forEach(function(el) {
+    colorearInput(el);
+  });
+}
+
+// Event delegation global — detecta cambios en CUALQUIER input numérico
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.type === 'number' && e.target.classList.contains('inp')) {
+    colorearInput(e.target);
+  }
+});
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.type === 'number' && e.target.classList.contains('inp')) {
+    colorearInput(e.target);
+  }
+});
 
 // ════════════════════════════════════════
 // RELOJ EN TIEMPO REAL
