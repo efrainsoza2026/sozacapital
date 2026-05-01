@@ -1281,9 +1281,7 @@ function rTarjetas() {
     var mInputs = '';
     for (var m=0; m<12; m++) {
       var pago = t.p[m];
-      var tieneValor = pago !== undefined && pago !== null && pago !== '';
-      var bgPago = tieneValor ? 'background:#EBF5FB;border-color:#1F4E78;color:#1F4E78;font-weight:700' : '';
-      mInputs += '<td class="r"><input class="inp" type="number" value="' + (tieneValor ? pago : '') + '" placeholder="0" style="width:68px;padding:3px 4px;font-size:11px;' + bgPago + '" data-ti="' + ti + '" data-mi="' + m + '" onchange="chgTarjPago(this)"></td>';
+      mInputs += '<td class="r"><input class="inp" type="number" value="' + (pago||'') + '" placeholder="0" style="width:68px;padding:3px 4px;font-size:11px" data-ti="' + ti + '" data-mi="' + m + '" onchange="chgTarjPago(this)"></td>';
     }
 
     var deudaCell = '<td class="r"><input class="inp" type="number" value="' + (t.d !== undefined && t.d !== null ? t.d : 0) + '" placeholder="0" style="width:86px;padding:3px 5px;font-size:11px" data-ti="' + ti + '" onchange="chgTarjDeuda(this)">';
